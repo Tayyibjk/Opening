@@ -1,37 +1,39 @@
 package fhwien.Opening;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import java.util.HashMap;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.Map;
 
 @RestController
+@RequestMapping("/api")
+
 public class OpeningHoursController {
 
-    private Map<String, String> openingHours = new HashMap<>();
+    private final OpeningHoursService openingHoursService;
 
-    @GetMapping("/api/hours")
+    public OpeningHoursController(OpeningHoursService openingHoursService) {
+        this.openingHoursService = openingHoursService;
+    }
+
+    @GetMapping("/hours")
     public Map<String, String> getOpeningHours() {
-        return openingHours;
+        return openingHoursService.getOpeningHours();
     }
 
-    @PostMapping("/api/hours/reset")
+    @PostMapping("/hours/reset")
     public void resetOpeningHours() {
-        openingHours.clear();
-        // add default opening hours here
+        openingHoursService.resetOpeningHours();
     }
 
-    @PostMapping("/api/hours/set")
-    public void setOpeningHoursForDay(@RequestParam String day, @RequestParam String open, @RequestParam String close) {
-        String hours = open + " - " + close;
-        openingHours.put(day, hours);
+    @PostMapping("/hours/set")
+    public void setOpeningHours(@RequestParam("day") String day,
+                                @RequestParam("open") String open,
+                                @RequestParam("close") String close) {
+        openingHoursService.setOpeningHours(day, open, close);
     }
 
-    @PostMapping("/api/hours/close")
-    public void closeDay(@RequestParam String day) {
-        openingHours.put(day, "closed");
+    @PostMapping("/hours/close")
+    public void closeDay(@RequestParam("day") String day) {
+        openingHoursService.closeDay(day);
     }
 }
-
